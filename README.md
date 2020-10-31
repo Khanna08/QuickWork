@@ -1,20 +1,7 @@
-<h3>Install Dependencies</h3>
+<h2>Quickwork Internship Task</h3>
 
 <p>
-    pip3 install -r requirements.txt
-</p>
-
-<br>
-
-<h3>Create Virtual Environment</h3>
-
-<p>
-    <ol>
-        <li>Open terminal at root path of the project</li>
-        <li>pip3 -m venv venv</li>
-        <li>source venv/bin/activate</li>
-        <li>virtual environment will start</li>
-    </ol>
+    The flow of the program is as follows : -
 </p>
 
 <br>
@@ -22,12 +9,38 @@
 <h3>Start Server</h3>
 
 <p>
-    Open Terminal, navigate to netW_app 
-    use command python3 app.py
+    Open Terminal, navigate to your repository and use command 'node app'
 </p>
 
 <br>
 
-<strong>
-    Virtual Enviorment should not be uploaded on git, so it is placed in gitignore file, with name of the virtual environment folder as venv.
-</strong>
+<h3>Open API endpoint to obtain oAuth cpent</h3>
+<p>
+    <ul>
+        <p>Open localhost:3000 on browser</p>
+        <p>sign in to your account</p>
+        <p>gmail will ask you for permissions</p>
+        <p>accept all of them</p>
+        <p>the app would store the oAuth credentials locally</p>
+        <p>and respond to user with following message if successful 'Obtained credentials stored locally'</p>
+    </ul>
+</p>
+
+<h3>Open API endpoint to send mails</h3>
+<p>
+    <ul>
+        <p>send an post request to localhost:3000/send</p>
+        <p>pass a json with following format</p>
+        <p>
+          <ul>
+            <p>{ </p>
+            <p>'email' : 'recipient email',</p>
+            <p>'subject' : 'subject of mail',</p>
+            <p>'content' : 'body of mail',</p>
+            <p>'choice' : 'send' // if you choose to send mail anyting else to save as draft</p>
+            <p>}</p>
+            <p>the mail would be sent with an acknowledgement recieved on the console</p>
+          </ul>
+        </p>
+    </ul>
+</p>
