@@ -6,6 +6,14 @@
 
 <br>
 
+<h3>Install dependencies</h3>
+
+<p>
+    Open Terminal, navigate to your repository and use command 'node install'
+</p>
+
+<br>
+
 <h3>Start Server</h3>
 
 <p>
