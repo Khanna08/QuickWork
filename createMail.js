@@ -47,6 +47,7 @@ class CreateMail{
 			
 			// task is user specified
 			if(this.task === 'send'){
+				// console.log('sending')
 				this.sendMail(encodedMessage);
 			}
 			this.saveDraft(encodedMessage);
@@ -72,7 +73,7 @@ class CreateMail{
 	//Saves the draft.
 	saveDraft(encodedMessage){
 		this.gmail.users.drafts.create({
-			'userId': this.me,
+			'userId': "me",
 			'resource': {
 				'message': {
 					'raw': encodedMessage 
