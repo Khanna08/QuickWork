@@ -1,21 +1,33 @@
-# QuickWork
-Send Email Task
+<h3>Install Dependencies</h3>
 
-The flow of the program is as follows : -
-1)  Start server
-2)  Open localhost:3000 on browser to reach API endpoint to obtain oAuth client
-    which would ask for permissions for writing and sending mails
-    accept all of them
-    the app would redirect itself automatically and store the oAuth credentials locally
-    and respond to user with following message if successful 'Obtained credentials stored locally'
-3)  now send an post request to localhost:3000/send
-    this is the API endpoint to send mails
-    the post request should have the request body with following format
-    a json 
-    {
-      'email' : 'recipient email',
-      'subject' : 'subject of mail',
-      'content' : 'body of mail',
-      'choice' : 'send' // if you choose to send mail anyting else to save as draft
-    }
-    the mail would be sent with an acknowledgement recieved on the console
+<p>
+    pip3 install -r requirements.txt
+</p>
+
+<br>
+
+<h3>Create Virtual Environment</h3>
+
+<p>
+    <ol>
+        <li>Open terminal at root path of the project</li>
+        <li>pip3 -m venv venv</li>
+        <li>source venv/bin/activate</li>
+        <li>virtual environment will start</li>
+    </ol>
+</p>
+
+<br>
+
+<h3>Start Server</h3>
+
+<p>
+    Open Terminal, navigate to netW_app 
+    use command python3 app.py
+</p>
+
+<br>
+
+<strong>
+    Virtual Enviorment should not be uploaded on git, so it is placed in gitignore file, with name of the virtual environment folder as venv.
+</strong>
