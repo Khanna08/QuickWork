@@ -1,6 +1,6 @@
 const fs = require('fs'); //file system library
 const express = require('express'); // express library
-const bodyParser = require('body-parser') // body-parser library
+const bodyParser = require('body-parser'); // body-parser library
 const {google} = require('googleapis'); // Google Rest API
 
 // express object stored in app
@@ -9,8 +9,10 @@ const app = express();
 // setting ejs as templating engine
 app.set('view engine', 'ejs');
 
-// used to understand request data
+// middleware to understand request data
 app.use(bodyParser.urlencoded({extended: false}));
+// middleware to understand request json
+app.use(express.json());
 
 
 /**
@@ -18,110 +20,128 @@ app.use(bodyParser.urlencoded({extended: false}));
  Here we are asking permission to write mails and sending them
  Add more scopes as per user requirement
 **/
-const SCOPES = [ 
-				'https://www.googleapis.com/auth/gmail.compose',
-				'https://www.googleapis.com/auth/gmail.send'
-			];
+const SCOPES = [
+				'https://www.googleapis.com/auth/gmail.compose', // permission to write
+ 				'https://www.googleapis.com/auth/gmail.send' // permission to send
+ 			];
 
 // gmail Oauth cient variable
 let oAuth2Client = undefined;
 
-// route to token (initially not available)
-const TOKEN_PATH = 'token.json';
- 
-// server route for home page
-// app.get('/', (req, res) => {
-// 	res.render('index');
-// });
+/**
+ trying to read credentials.json
+ credentials.json is app specific file
+ it stores the client id and secrets of app
+ which are not accessible to user
+**/
+fs.readFile('credentials.json', (err, content) => {
+	if(err){
+		// if credential file not found
+		console.log(err);
 
-// route to Obtain gmail users credentials
-app.get('/', (req, res) => {
-	// reading credential file which should be present beforehand
-	fs.readFile('credentials.json', (err, content) => {
-		if(err){
-			// if credential file not found
-			res.send('Error loading client secret file:');
-			console.log(err);
-		}
-		else {
-			// parsing data from credential.json
-			credentials = JSON.parse(content);
+	}
+	else {
+		// parsing data from credential.json
+		credentials = JSON.parse(content);
 
-			const {client_secret, client_id, redirect_uris} = credentials.installed;
+		const {client_secret, client_id, redirect_uris} = credentials.installed;
 
-			// creating Oauth client
-			oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-			
-			// trying to read token.json
-			fs.readFile(TOKEN_PATH, (err, token) => {
-				if(err){
-
-					// if tokens not initially present then user will be asked to do these steps
-					const authUrl = oAuth2Client.generateAuthUrl({
-						access_type: 'offline',
-						scope: SCOPES,
-					});
-					// granting access
-					res.redirect(authUrl)
-				}
-				else{
-					// creating Oauth client with user credentials
-					oAuth2Client.setCredentials(JSON.parse(token));
-					
-					// sending mail template
-					res.render('compose');
-				}
-			});
-		}
-	});
+		// declaring Oauth client
+		oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[1]);
+	}
 });
 
-// extra step if token not initially available
-app.get('/accessCode/:code', (req, res) => {
+/**
+ it s the path to token.json file
+ which stores access and refresh tokens
+ it is not available initially
+ it is created after user allows the app access to certain gmail permissions
+**/
+const TOKEN_PATH = 'token.json';
 
-	// code = req.params.code;
-	console.log(req.params);
+// API endpoint to create oAuth client
+app.get('/', (req, res) => {
 
-	// user access grant code
-	// code = req.body.code;
+	/**
+	 authUrl is created using Scopes passed in oAuth client
+	 this defines the permission required
+	 it directs to user to allow the app access to its gmail account
+	**/
+	const authUrl = oAuth2Client.generateAuthUrl({
+		access_type: 'offline',
+		scope: SCOPES,
+	});
+	/**
+	 redirect to the url formed
+	 after all permissions are granted the 
+	 API automatically serves to /accessCode route
+	**/
+	res.redirect(authUrl);
+});
+// API endpoint to store the oAuth client access and refresh tokens
+app.get('/accessCode', (req, res) => {
 
+	// this refers to grant code
+	code = req.query.code;
+
+	// using grant tokent to get access and refresh tokens
 	oAuth2Client.getToken(code, (err, token) => {
 		if (err){
 			res.send('Error retrieving access token', err);
 			console.log(err);
 		}
-
-		// creating Oauth client with user credentials
-		oAuth2Client.setCredentials(token);
-		
-		// Store the token to disk for later program executions
+		// store the tokens in a token.json file
 		fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
 			if (err){
 				console.log(err);
 			}
 		});
+
+		// respond to user 
+		res.send('Obtained credentials stored locally');
 	});
-	// sending mail template
-	// res.render('compose');
 });
 
-// result page
-app.get('/send', (req, res) => {
+/**
+ API end point to send mail
+ while requesting this API send a json with
+ required data in required format
+ {
+	'email' : 'recipient email'
+	'subject' : 'subject of mail',
+	'content' : 'body of mail',
+	'choice' : 'send' // if you choose to send mail anyting else to save as draft
+ }
+**/
+app.post('/send', (req, res) => {
+
+	// reading locally stored credentials
+	fs.readFile(TOKEN_PATH, (err, token) => {
+		if(err){
+			res.send('consent to permissions');
+		}
+		// assign obtained credentials to oAuth client
+		oAuth2Client.setCredentials(JSON.parse(token));
+	});
 
 	// console.log(oAuth2Client);
 
-	// stores user recieved info
-	// var {Smail, Rmail, subject, content, choice} = req.body;
 
-	// accessing create mail library
+	// stores user recieved info
+	var {email, subject, content, choice} = req.body;
+
+	// accessing createMail object from javascript file
 	var Mail = require('./createMail.js');
 
-	// var obj = new Mail(oAuth2Client, Smail, Rmail, subject, content, choice);
-	var obj = new Mail(oAuth2Client, 'akshitkhanna69@gmail.com', 'akkiextreme@gmail.com', 'subject', 'content', 'send');
+	// obj stores mail object wit reuired info
+	var obj = new Mail(oAuth2Client, email, subject, content, choice);
+	// var obj = new Mail(oAuth2Client, 'akshitkhanna69@gmail.com', 'akkiextreme@gmail.com', 'subject', 'content', 'send');
 
 
-    obj.makeBody();
+	// creates mail and chooses to either send or save as per requirement
+	obj.makeBody();
 
 });
 
+// this is the port where APIs can be listened
 app.listen(3000);
