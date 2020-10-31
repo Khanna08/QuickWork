@@ -90,6 +90,8 @@ app.get('/accessCode', (req, res) => {
 			res.send('Error retrieving access token', err);
 			console.log(err);
 		}
+		oAuth2Client.setCredentials(token);
+
 		// store the tokens in a token.json file
 		fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
 			if (err){
@@ -129,16 +131,16 @@ app.post('/send', (req, res) => {
 
 	// stores user recieved info
 	var {email, subject, content, choice} = req.body;
+	// console.log(req.body)
 
-	// accessing createMail object from javascript file
+	// // accessing createMail object from javascript file
 	var Mail = require('./createMail.js');
 
-	// obj stores mail object wit reuired info
+	// // obj stores mail object wit reuired info
 	var obj = new Mail(oAuth2Client, email, subject, content, choice);
-	// var obj = new Mail(oAuth2Client, 'akshitkhanna69@gmail.com', 'akkiextreme@gmail.com', 'subject', 'content', 'send');
 
 
-	// creates mail and chooses to either send or save as per requirement
+	// // creates mail and chooses to either send or save as per requirement
 	obj.makeBody();
 
 });
