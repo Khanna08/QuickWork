@@ -22,7 +22,7 @@
 
 <br>
 
-<h3>Open API endpoint to obtain oAuth cpent</h3>
+<h3>Open API endpoint to obtain oAuth client</h3>
 <p>
     <ul>
         <p>Open localhost:3000 on browser</p>
