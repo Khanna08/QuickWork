@@ -26,6 +26,8 @@
     </ul>
 </p>
 
+<br>
+
 <h3>Open API endpoint to send mails</h3>
 <p>
     <ul>
@@ -39,8 +41,8 @@
             <p>'content' : 'body of mail',</p>
             <p>'choice' : 'send' // if you choose to send mail anyting else to save as draft</p>
             <p>}</p>
-            <p>the mail would be sent with an acknowledgement recieved on the console</p>
           </ul>
         </p>
+        <p>the mail would be sent with an acknowledgement recieved on the console</p>
     </ul>
 </p>
